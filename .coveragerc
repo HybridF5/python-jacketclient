@@ -1,0 +1,7 @@
+[run]
+branch = True
+source = jacketclient
+omit = jacketclient/openstack/*
+
+[report]
+ignore_errors = True
