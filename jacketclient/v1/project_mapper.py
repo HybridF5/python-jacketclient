@@ -108,4 +108,7 @@ class ProjectMapperManager(base.ManagerWithFind):
 
         body = self._build_body(project_id, dest_project_id, **kwargs)
 
-        return self._update("/project_mapper", body, "project_mapper")
+        if 'project_id' in body['project_mapper']:
+            del body['project_mapper']['project_id']
+
+        return self._update("/project_mapper/%s" % project_id, body, "project_mapper")
