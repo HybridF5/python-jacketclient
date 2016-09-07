@@ -23,6 +23,7 @@ from jacketclient.i18n import _LE
 from jacketclient.v1 import flavor_mapper
 from jacketclient.v1 import image_mapper
 from jacketclient.v1 import project_mapper
+from jacketclient.v1 import versions
 
 
 class Client(object):
@@ -101,6 +102,8 @@ class Client(object):
         self.tenant_id = tenant_id
         self.user_id = user_id
         self.os_cache = os_cache or not no_cache
+
+        self.versions = versions.VersionManager(self)
 
         self.image_mapper = image_mapper.ImageMapperManager(self)
         self.flavor_mapper = flavor_mapper.FlavorMapperManager(self)

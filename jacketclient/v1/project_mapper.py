@@ -33,6 +33,8 @@ class ProjectMapper(base.Resource):
 class ProjectMapperManager(base.ManagerWithFind):
     """Manager :class:`project mapper` resources."""
 
+    resource_class = ProjectMapper
+
     def list(self, detailed=True, limit=None):
         """
         list all project mapper
@@ -53,7 +55,7 @@ class ProjectMapperManager(base.ManagerWithFind):
         if detailed:
             detail = "/detail"
 
-        return self._list("/project_mapper%s%s" % (detail, query_string), "project_mapper")
+        return self._list("/project_mapper%s%s" % (detail, query_string), "projects_mapper")
 
     def get(self, project_id):
         """Get a specific project mapper."""
@@ -61,7 +63,7 @@ class ProjectMapperManager(base.ManagerWithFind):
         return self._get("/project_mapper/%s" % project_id, "project_mapper")
 
     @staticmethod
-    def _build_body(self, project_id, dest_project_id, **kwargs):
+    def _build_body(project_id, dest_project_id, **kwargs):
 
         project_mapper = {}
 

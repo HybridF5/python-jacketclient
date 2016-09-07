@@ -33,6 +33,8 @@ class ImageMapper(base.Resource):
 class ImageMapperManager(base.ManagerWithFind):
     """Manager :class:`image mapper` resources."""
 
+    resource_class = ImageMapper
+
     def list(self, detailed=True, limit=None):
         """
         list all image mapper
@@ -53,7 +55,7 @@ class ImageMapperManager(base.ManagerWithFind):
         if detailed:
             detail = "/detail"
 
-        return self._list("/image_mapper%s%s" % (detail, query_string), "image_mapper")
+        return self._list("/image_mapper%s%s" % (detail, query_string), "images_mapper")
 
     def get(self, image_id):
         """Get a specific image mapper."""
@@ -61,7 +63,7 @@ class ImageMapperManager(base.ManagerWithFind):
         return self._get("/image_mapper/%s" % image_id, "image_mapper")
 
     @staticmethod
-    def _build_body(self, image_id, dest_image_id, project_id=None, **kwargs):
+    def _build_body(image_id, dest_image_id, project_id=None, **kwargs):
 
         image_mapper = {}
 
@@ -111,4 +113,7 @@ class ImageMapperManager(base.ManagerWithFind):
 
         body = self._build_body(image_id, dest_image_id, project_id=project_id, **kwargs)
 
-        return self._update("/image_mapper", body, "image_mapper")
+        if 'image_id' in body['image_mapper']:
+            del body['image_mapper']['image_id']
+
+        return self._update("/image_mapper/%s" % image_id, body, "image_mapper")

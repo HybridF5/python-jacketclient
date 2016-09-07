@@ -53,7 +53,7 @@ DEFAULT_MAJOR_OS_JACKET_API_VERSION = "1.0"
 # to find out the most recent version between client and server, and
 # '2.latest' means to that. This value never be changed until we decided to
 # change the default behaviour of jacket client CLI.
-DEFAULT_OS_JACKET_API_VERSION = '1.0'
+DEFAULT_OS_JACKET_API_VERSION = '1.latest'
 DEFAULT_JACKET_ENDPOINT_TYPE = 'publicURL'
 DEFAULT_JACKET_SERVICE_TYPE = "jacket"
 
@@ -636,6 +636,8 @@ class OpenStackComputeShell(object):
             '--help' in argv) or ('-h' in argv) or not argv
 
         # bash-completion should not require authentication
+        print("do_help = %s", do_help)
+        print("argv = %s", argv)
         skip_auth = do_help or (
             'bash-completion' in argv)
 
@@ -660,7 +662,7 @@ class OpenStackComputeShell(object):
         os_region_name = args.os_region_name
         os_auth_system = args.os_auth_system
 
-        if "v1.0" not in os_auth_url:
+        if "v2.0" not in os_auth_url:
             # NOTE(andreykurilin): assume that keystone V3 is used and try to
             # be more user-friendly, i.e provide default values for domains
             if (not args.os_project_domain_id and

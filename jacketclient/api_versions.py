@@ -270,7 +270,7 @@ def discover_version(client, requested_version):
         client)
 
     if (not requested_version.is_latest() and
-            requested_version != APIVersion('2.0')):
+            requested_version != APIVersion('1.0')):
         if server_start_version.is_null() and server_end_version.is_null():
             raise exceptions.UnsupportedVersion(
                 _("Server doesn't support microversions"))
@@ -283,18 +283,8 @@ def discover_version(client, requested_version):
                     "max": server_end_version.get_string()})
         return requested_version
 
-    if requested_version == APIVersion('2.0'):
-        if (server_start_version == APIVersion('2.1') or
-                (server_start_version.is_null() and
-                 server_end_version.is_null())):
-            return APIVersion('2.0')
-        else:
-            raise exceptions.UnsupportedVersion(
-                _("The server isn't backward compatible with Nova V2 REST "
-                  "API"))
-
     if server_start_version.is_null() and server_end_version.is_null():
-        return APIVersion('2.0')
+        return APIVersion('1.0')
     elif jacketclient.API_MIN_VERSION > server_end_version:
         raise exceptions.UnsupportedVersion(
             _("Server version is too old. The client valid version range is "

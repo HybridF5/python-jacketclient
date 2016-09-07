@@ -185,7 +185,7 @@ class HTTPClient(object):
             if not auth_url:
                 raise exceptions.EndpointNotFound()
         self.auth_url = auth_url.rstrip('/') if auth_url else auth_url
-        self.version = 'v1.1'
+        self.version = 'v1.0'
         self.region_name = region_name
         self.endpoint_type = endpoint_type
         self.service_type = service_type
@@ -621,7 +621,7 @@ class HTTPClient(object):
         if self.bypass_url:
             self.set_management_url(self.bypass_url)
         elif not self.management_url:
-            raise exceptions.Unauthorized('Nova Client')
+            raise exceptions.Unauthorized('Jacket Client')
 
         self._save_keys()
 

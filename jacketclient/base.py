@@ -344,6 +344,7 @@ class Manager(HookableMixin):
 
     def _get(self, url, response_key):
         resp, body = self.api.client.get(url)
+        print body
         if response_key is not None:
             content = body[response_key]
         else:

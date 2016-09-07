@@ -33,6 +33,8 @@ class FlavorMapper(base.Resource):
 class FlavorMapperManager(base.ManagerWithFind):
     """Manager :class:`flavor mapper` resources."""
 
+    resource_class = FlavorMapper
+
     def list(self, detailed=True, limit=None):
         """
         list all flavor mapper
@@ -53,7 +55,7 @@ class FlavorMapperManager(base.ManagerWithFind):
         if detailed:
             detail = "/detail"
 
-        return self._list("/flavor_mapper%s%s" % (detail, query_string), "flavor_mapper")
+        return self._list("/flavor_mapper%s%s" % (detail, query_string), "flavors_mapper")
 
     def get(self, flavor_id):
         """Get a specific flavor mapper."""
@@ -61,7 +63,7 @@ class FlavorMapperManager(base.ManagerWithFind):
         return self._get("/flavor_mapper/%s" % flavor_id, "flavor_mapper")
 
     @staticmethod
-    def _build_body(self, flavor_id, dest_flavor_id, project_id=None, **kwargs):
+    def _build_body(flavor_id, dest_flavor_id, project_id=None, **kwargs):
 
         flavor_mapper = {}
 
@@ -111,4 +113,7 @@ class FlavorMapperManager(base.ManagerWithFind):
 
         body = self._build_body(flavor_id, dest_flavor_id, project_id=project_id, **kwargs)
 
-        return self._update("/flavor_mapper", body, "flavor_mapper")
+        if 'flavor_id' in body['flavor_mapper']:
+            del body['flavor_mapper']['flavor_id']
+
+        return self._update("/flavor_mapper/%s" % flavor_id, body, "flavor_mapper")
