@@ -90,6 +90,49 @@ def _columns_get(objs, default_columns):
         return columns
 
 
+def _print_flavor_extra_specs(flavor):
+    try:
+        return flavor.get_keys()
+    except exceptions.NotFound:
+        return "N/A"
+
+
+def _translate_keys(collection, convert):
+    for item in collection:
+        keys = item.__dict__.keys()
+        for from_key, to_key in convert:
+            if from_key in keys and to_key not in keys:
+                setattr(item, to_key, item._info[from_key])
+
+
+def _translate_flavor_keys(collection):
+    _translate_keys(collection, [('ram', 'memory_mb')])
+
+
+def _print_flavor_list(flavors, show_extra_specs=False):
+    _translate_flavor_keys(flavors)
+
+    headers = [
+        'ID',
+        'Name',
+        'Memory_MB',
+        'Disk',
+        'Ephemeral',
+        'Swap',
+        'VCPUs',
+        'RXTX_Factor',
+        'Is_Public',
+    ]
+
+    if show_extra_specs:
+        formatters = {'extra_specs': _print_flavor_extra_specs}
+        headers.append('extra_specs')
+    else:
+        formatters = {}
+
+    utils.print_list(flavors, headers, formatters)
+
+
 @utils.arg(
     'image_id',
     metavar='<image_id>',
@@ -382,3 +425,9 @@ def do_project_mapper_update(cs, args):
     project_mapper = cs.project_mapper.update(args.project_id, args.dest_project_id,
                                               **properties)
     utils.print_dict(project_mapper._info)
+
+
+def do_sub_flavor_list(cs, args):
+    sub_flavors = cs.sub_flavor.list()
+
+    _print_flavor_list(sub_flavors)

@@ -23,6 +23,7 @@ from jacketclient.i18n import _LE
 from jacketclient.v1 import flavor_mapper
 from jacketclient.v1 import image_mapper
 from jacketclient.v1 import project_mapper
+from jacketclient.v1 import sub_flavor
 from jacketclient.v1 import versions
 
 
@@ -108,6 +109,7 @@ class Client(object):
         self.image_mapper = image_mapper.ImageMapperManager(self)
         self.flavor_mapper = flavor_mapper.FlavorMapperManager(self)
         self.project_mapper = project_mapper.ProjectMapperManager(self)
+        self.sub_flavor = sub_flavor.SubFlavorManager(self)
 
         # Add in any extensions...
         if extensions:
