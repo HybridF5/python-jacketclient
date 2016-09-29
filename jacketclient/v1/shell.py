@@ -133,6 +133,10 @@ def _print_flavor_list(flavors, show_extra_specs=False):
     utils.print_list(flavors, headers, formatters)
 
 
+def _print_volume_type_list(vtypes):
+    utils.print_list(vtypes, ['ID', 'Name', 'Description', 'Is_Public'])
+
+
 @utils.arg(
     'image_id',
     metavar='<image_id>',
@@ -431,3 +435,8 @@ def do_sub_flavor_list(cs, args):
     sub_flavors = cs.sub_flavor.list()
 
     _print_flavor_list(sub_flavors)
+
+def do_sub_volume_type_list(cs, args):
+    sub_volume_types = cs.sub_volume_type.list()
+
+    _print_volume_type_list(sub_volume_types)

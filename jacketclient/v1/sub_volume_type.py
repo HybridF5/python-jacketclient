@@ -13,25 +13,25 @@
 #    under the License.
 
 """
-flavor mapper interface.
+sub volume type interface.
 """
 
 from jacketclient import base
 
 
-class SubFlavor(base.Resource):
+class SubVolumeType(base.Resource):
     """image mapper."""
 
     NAME_ATTR = 'name'
 
     def __repr__(self):
-        return "<Flavor: %s>" % self.name
+        return "<VolumeType: %s>" % self.name
 
 
-class SubFlavorManager(base.ManagerWithFind):
-    """Manager :class:`flavor mapper` resources."""
+class SubVolumeTypeManager(base.ManagerWithFind):
+    """Manager :class:`sub volume type` resources."""
 
-    resource_class = SubFlavor
+    resource_class = SubVolumeType
 
     def list(self):
         """
@@ -39,4 +39,4 @@ class SubFlavorManager(base.ManagerWithFind):
         :return:
         """
 
-        return self._list("/sub_flavor/detail", "sub_flavors")
+        return self._list("/sub_volume_type/detail", "sub_volume_types")
