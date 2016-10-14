@@ -55,7 +55,8 @@ class ImageMapperManager(base.ManagerWithFind):
         if detailed:
             detail = "/detail"
 
-        return self._list("/image_mapper%s%s" % (detail, query_string), "images_mapper")
+        return self._list("/image_mapper%s%s" % (detail, query_string),
+                          "images_mapper")
 
     def get(self, image_id):
         """Get a specific image mapper."""
@@ -70,11 +71,9 @@ class ImageMapperManager(base.ManagerWithFind):
         if image_id is None:
             raise exceptions.CommandError(_("image id must be specified."))
 
-        if dest_image_id is None:
-            raise exceptions.CommandError(_("dest image id must be specified."))
-
         image_mapper['image_id'] = image_id
-        image_mapper['dest_image_id'] = dest_image_id
+        if dest_image_id:
+            image_mapper['dest_image_id'] = dest_image_id
 
         if project_id:
             image_mapper['project_id'] = project_id
@@ -94,7 +93,11 @@ class ImageMapperManager(base.ManagerWithFind):
         :return:
         """
 
-        body = self._build_body(image_id, dest_image_id, project_id=project_id, **kwargs)
+        if dest_image_id is None:
+            raise exceptions.CommandError(_("dest image id must be specified."))
+
+        body = self._build_body(image_id, dest_image_id, project_id=project_id,
+                                **kwargs)
 
         return self._create("/image_mapper", body, "image_mapper")
 
@@ -102,7 +105,8 @@ class ImageMapperManager(base.ManagerWithFind):
 
         return self._delete("/image_mapper/%s" % image_id)
 
-    def update(self, image_id, dest_image_id, project_id=None, **kwargs):
+    def update(self, image_id, dest_image_id, project_id=None,
+               set_properties=None, unset_properties=None):
         """update image mapper
         :param image_id:
         :param dest_image_id:
@@ -110,8 +114,10 @@ class ImageMapperManager(base.ManagerWithFind):
         :param kwargs:
         :return:
         """
-
-        body = self._build_body(image_id, dest_image_id, project_id=project_id, **kwargs)
+        kwargs = {'set_properties': set_properties,
+                  'unset_properties': unset_properties}
+        body = self._build_body(image_id, dest_image_id, project_id=project_id,
+                                **kwargs)
 
         if 'image_id' in body['image_mapper']:
             del body['image_mapper']['image_id']

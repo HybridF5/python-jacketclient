@@ -636,8 +636,6 @@ class OpenStackComputeShell(object):
             '--help' in argv) or ('-h' in argv) or not argv
 
         # bash-completion should not require authentication
-        print("do_help = %s", do_help)
-        print("argv = %s", argv)
         skip_auth = do_help or (
             'bash-completion' in argv)
 

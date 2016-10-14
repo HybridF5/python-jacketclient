@@ -55,7 +55,8 @@ class ProjectMapperManager(base.ManagerWithFind):
         if detailed:
             detail = "/detail"
 
-        return self._list("/project_mapper%s%s" % (detail, query_string), "projects_mapper")
+        return self._list("/project_mapper%s%s" % (detail, query_string),
+                          "projects_mapper")
 
     def get(self, project_id):
         """Get a specific project mapper."""
@@ -70,11 +71,9 @@ class ProjectMapperManager(base.ManagerWithFind):
         if project_id is None:
             raise exceptions.CommandError(_("project id must be specified."))
 
-        if dest_project_id is None:
-            raise exceptions.CommandError(_("dest project id must be specified."))
-
         project_mapper['project_id'] = project_id
-        project_mapper['dest_project_id'] = dest_project_id
+        if dest_project_id:
+            project_mapper['dest_project_id'] = dest_project_id
 
         for key, value in kwargs.iteritems():
             if value:
@@ -89,6 +88,9 @@ class ProjectMapperManager(base.ManagerWithFind):
         :param kwargs:
         :return:
         """
+        if dest_project_id is None:
+            raise exceptions.CommandError(
+                _("dest project id must be specified."))
 
         body = self._build_body(project_id, dest_project_id, **kwargs)
 
@@ -98,7 +100,8 @@ class ProjectMapperManager(base.ManagerWithFind):
 
         return self._delete("/project_mapper/%s" % project_id)
 
-    def update(self, project_id, dest_project_id, **kwargs):
+    def update(self, project_id, dest_project_id, set_properties=None,
+               unset_properties=None):
         """update project mapper
         :param project_id:
         :param dest_project_id:
@@ -106,9 +109,13 @@ class ProjectMapperManager(base.ManagerWithFind):
         :return:
         """
 
+        kwargs = {'set_properties': set_properties,
+                  'unset_properties': unset_properties}
+
         body = self._build_body(project_id, dest_project_id, **kwargs)
 
         if 'project_id' in body['project_mapper']:
             del body['project_mapper']['project_id']
 
-        return self._update("/project_mapper/%s" % project_id, body, "project_mapper")
+        return self._update("/project_mapper/%s" % project_id, body,
+                            "project_mapper")

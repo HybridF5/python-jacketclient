@@ -47,12 +47,13 @@ from jacketclient.i18n import _LE
 from jacketclient import shell
 from jacketclient import utils
 
-
 logger = logging.getLogger(__name__)
 
 DEFAULT_IMAGE_MAPPER_KEYS = ['image_id', 'dest_image_id', 'project_id']
 DEFAULT_FLAVOR_MAPPER_KEYS = ['flavor_id', 'dest_flavor_id', 'project_id']
 DEFAULT_PROJECT_MAPPER_KEYS = ['project_id', 'dest_project_id']
+DEFAULT_INSTANCE_MAPPER_KEYS = ['instance_id', 'provider_instance_id',
+                                'project_id']
 
 
 # NOTE(mriedem): Remove this along with the deprecated commands in the first
@@ -74,6 +75,20 @@ def _key_value_pairing(text):
 
 def _property_parsing(raw_properties):
     return dict(_key_value_pairing(datum) for datum in raw_properties)
+
+
+def _extract_keys(raw_properties):
+    ret = {}
+    for one in raw_properties:
+        # unset doesn't require a val, so we have the if/else
+        if '=' in one:
+            (key, value) = one.split('=', 1)
+        else:
+            key = one
+            value = None
+
+        ret[key] = value
+    return ret
 
 
 def _columns_get(objs, default_columns):
@@ -164,8 +179,8 @@ def do_image_mapper_create(cs, args):
     raw_properties = args.property
     properties = _property_parsing(raw_properties)
 
-    image_mapper = cs.image_mapper.create(args.image_id, args.dest_image_id, args.project_id,
-                           **properties)
+    image_mapper = cs.image_mapper.create(args.image_id, args.dest_image_id,
+                                          args.project_id, **properties)
     utils.print_dict(image_mapper._info)
 
 
@@ -176,6 +191,7 @@ def do_image_mapper_list(cs, args):
 
     columns = _columns_get(image_mappers, DEFAULT_IMAGE_MAPPER_KEYS)
     utils.print_list(image_mappers, columns)
+
 
 @utils.arg(
     'image_id',
@@ -210,7 +226,7 @@ def do_image_mapper_delete(cs, args):
     metavar='<image_id>',
     help=_("ID of image (see 'glance image-list')."))
 @utils.arg(
-    'dest_image_id',
+    '--dest_image_id',
     default=None,
     metavar='<dest_image_id>',
     help=_("ID of dest image. "))
@@ -220,21 +236,34 @@ def do_image_mapper_delete(cs, args):
     metavar='<project-id>',
     help=_("ID of project (see 'keystone tenant-list')."))
 @utils.arg(
-    '--property',
+    '--set',
     metavar="<key=value>",
     action='append',
-    dest='property',
+    dest='set',
     default=[],
-    help=_("Arbitrary property to associate with image id."
+    help=_("key and value pair to set."
+           "May be used multiple times."))
+@utils.arg(
+    '--unset',
+    metavar="<key=value>",
+    action='append',
+    dest='unset',
+    default=[],
+    help=_("key and value pair to unset."
            "May be used multiple times."))
 def do_image_mapper_update(cs, args):
     """create a new image mapper."""
 
-    raw_properties = args.property
-    properties = _property_parsing(raw_properties)
+    set_properties = args.set
+    set_properties = _property_parsing(set_properties)
 
-    image_mapper = cs.image_mapper.update(args.image_id, args.dest_image_id, args.project_id,
-                                          **properties)
+    unset_properties = args.unset
+    unset_properties = _extract_keys(unset_properties)
+
+    image_mapper = cs.image_mapper.update(args.image_id, args.dest_image_id,
+                                          args.project_id,
+                                          set_properties=set_properties,
+                                          unset_properties=unset_properties)
     utils.print_dict(image_mapper._info)
 
 
@@ -265,8 +294,9 @@ def do_flavor_mapper_create(cs, args):
     raw_properties = args.property
     properties = _property_parsing(raw_properties)
     print(args)
-    flavor_mapper = cs.flavor_mapper.create(args.flavor_id, args.dest_flavor_id, args.project_id,
-                           **properties)
+    flavor_mapper = cs.flavor_mapper.create(args.flavor_id, args.dest_flavor_id,
+                                            args.project_id,
+                                            **properties)
     utils.print_dict(flavor_mapper._info)
 
 
@@ -277,6 +307,7 @@ def do_flavor_mapper_list(cs, args):
 
     columns = _columns_get(flavor_mappers, DEFAULT_FLAVOR_MAPPER_KEYS)
     utils.print_list(flavor_mappers, columns)
+
 
 @utils.arg(
     'flavor_id',
@@ -311,7 +342,7 @@ def do_flavor_mapper_delete(cs, args):
     metavar='<flavor_id>',
     help=_("ID of flavor (see 'nova flavor-list')."))
 @utils.arg(
-    'dest_flavor_id',
+    '--dest_flavor_id',
     default=None,
     metavar='<dest_flavor_id>',
     help=_("ID of dest flavor. "))
@@ -321,23 +352,35 @@ def do_flavor_mapper_delete(cs, args):
     metavar='<project-id>',
     help=_("ID of project (see 'keystone tenant-list')."))
 @utils.arg(
-    '--property',
+    '--set',
     metavar="<key=value>",
     action='append',
-    dest='property',
+    dest='set',
     default=[],
-    help=_("Arbitrary property to associate with flavor id."
+    help=_("key and value pair to set."
+           "May be used multiple times."))
+@utils.arg(
+    '--unset',
+    metavar="<key=value>",
+    action='append',
+    dest='unset',
+    default=[],
+    help=_("key and value pair to unset."
            "May be used multiple times."))
 def do_flavor_mapper_update(cs, args):
     """create a new flavor mapper."""
 
-    raw_properties = args.property
-    properties = _property_parsing(raw_properties)
+    set_properties = args.set
+    set_properties = _property_parsing(set_properties)
 
-    flavor_mapper = cs.flavor_mapper.update(args.flavor_id, args.dest_flavor_id, args.project_id,
-                                          **properties)
+    unset_properties = args.unset
+    unset_properties = _extract_keys(unset_properties)
+
+    flavor_mapper = cs.flavor_mapper.update(args.flavor_id, args.dest_flavor_id,
+                                            args.project_id,
+                                            set_properties=set_properties,
+                                            unset_properties=unset_properties)
     utils.print_dict(flavor_mapper._info)
-
 
 
 @utils.arg(
@@ -362,8 +405,9 @@ def do_project_mapper_create(cs, args):
     raw_properties = args.property
     properties = _property_parsing(raw_properties)
 
-    project_mapper = cs.project_mapper.create(args.project_id, args.dest_project_id,
-                           **properties)
+    project_mapper = cs.project_mapper.create(args.project_id,
+                                              args.dest_project_id,
+                                              **properties)
     utils.print_dict(project_mapper._info)
 
 
@@ -374,6 +418,7 @@ def do_project_mapper_list(cs, args):
 
     columns = _columns_get(project_mappers, DEFAULT_PROJECT_MAPPER_KEYS)
     utils.print_list(project_mappers, columns)
+
 
 @utils.arg(
     'project_id',
@@ -408,26 +453,39 @@ def do_project_mapper_delete(cs, args):
     metavar='<project_id>',
     help=_("ID of project (see 'keystone project-list')."))
 @utils.arg(
-    'dest_project_id',
+    '--dest_project_id',
     default=None,
     metavar='<dest-project-id>',
     help=_("ID of dest project. "))
 @utils.arg(
-    '--property',
+    '--set',
     metavar="<key=value>",
     action='append',
-    dest='property',
+    dest='set',
     default=[],
-    help=_("Arbitrary property to associate with project id."
+    help=_("key and value pair to set."
+           "May be used multiple times."))
+@utils.arg(
+    '--unset',
+    metavar="<key=value>",
+    action='append',
+    dest='unset',
+    default=[],
+    help=_("key and value pair to unset."
            "May be used multiple times."))
 def do_project_mapper_update(cs, args):
     """create a new project mapper."""
 
-    raw_properties = args.property
-    properties = _property_parsing(raw_properties)
+    set_properties = args.set
+    set_properties = _property_parsing(set_properties)
 
-    project_mapper = cs.project_mapper.update(args.project_id, args.dest_project_id,
-                                              **properties)
+    unset_properties = args.unset
+    unset_properties = _extract_keys(unset_properties)
+
+    project_mapper = cs.project_mapper.update(args.project_id,
+                                              args.dest_project_id,
+                                              set_properties=set_properties,
+                                              unset_properties=unset_properties)
     utils.print_dict(project_mapper._info)
 
 
@@ -436,7 +494,31 @@ def do_sub_flavor_list(cs, args):
 
     _print_flavor_list(sub_flavors)
 
+
 def do_sub_volume_type_list(cs, args):
     sub_volume_types = cs.sub_volume_type.list()
 
     _print_volume_type_list(sub_volume_types)
+
+
+def do_instance_mapper_list(cs, args):
+    """list all instance mapper"""
+
+    instance_mappers = cs.instance_mapper.list()
+
+    columns = _columns_get(instance_mappers, DEFAULT_INSTANCE_MAPPER_KEYS)
+    utils.print_list(instance_mappers, columns)
+
+
+@utils.arg(
+    'instance_id',
+    default=None,
+    metavar='<instance_id>',
+    help=_("ID of instance (see 'nova list')."))
+def do_instance_mapper_show(cs, args):
+    """show instance mapper"""
+
+    instance_mapper = cs.instance_mapper.get(args.instance_id)
+
+    utils.print_dict(instance_mapper._info)
+

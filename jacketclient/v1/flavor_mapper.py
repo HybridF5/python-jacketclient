@@ -55,7 +55,8 @@ class FlavorMapperManager(base.ManagerWithFind):
         if detailed:
             detail = "/detail"
 
-        return self._list("/flavor_mapper%s%s" % (detail, query_string), "flavors_mapper")
+        return self._list("/flavor_mapper%s%s" % (detail, query_string),
+                          "flavors_mapper")
 
     def get(self, flavor_id):
         """Get a specific flavor mapper."""
@@ -70,11 +71,9 @@ class FlavorMapperManager(base.ManagerWithFind):
         if flavor_id is None:
             raise exceptions.CommandError(_("flavor id must be specified."))
 
-        if dest_flavor_id is None:
-            raise exceptions.CommandError(_("dest flavor id must be specified."))
-
         flavor_mapper['flavor_id'] = flavor_id
-        flavor_mapper['dest_flavor_id'] = dest_flavor_id
+        if dest_flavor_id:
+            flavor_mapper['dest_flavor_id'] = dest_flavor_id
 
         if project_id:
             flavor_mapper['project_id'] = project_id
@@ -94,7 +93,12 @@ class FlavorMapperManager(base.ManagerWithFind):
         :return:
         """
 
-        body = self._build_body(flavor_id, dest_flavor_id, project_id=project_id, **kwargs)
+        if dest_flavor_id is None:
+            raise exceptions.CommandError(
+                _("dest flavor id must be specified."))
+
+        body = self._build_body(flavor_id, dest_flavor_id,
+                                project_id=project_id, **kwargs)
 
         return self._create("/flavor_mapper", body, "flavor_mapper")
 
@@ -102,7 +106,8 @@ class FlavorMapperManager(base.ManagerWithFind):
 
         return self._delete("/flavor_mapper/%s" % flavor_id)
 
-    def update(self, flavor_id, dest_flavor_id, project_id=None, **kwargs):
+    def update(self, flavor_id, dest_flavor_id, project_id=None,
+               set_properties=None, unset_properties=None):
         """update flavor mapper
         :param flavor_id:
         :param dest_flavor_id:
@@ -111,9 +116,14 @@ class FlavorMapperManager(base.ManagerWithFind):
         :return:
         """
 
-        body = self._build_body(flavor_id, dest_flavor_id, project_id=project_id, **kwargs)
+        kwargs = {'set_properties': set_properties,
+                  'unset_properties': unset_properties}
+
+        body = self._build_body(flavor_id, dest_flavor_id,
+                                project_id=project_id, **kwargs)
 
         if 'flavor_id' in body['flavor_mapper']:
             del body['flavor_mapper']['flavor_id']
 
-        return self._update("/flavor_mapper/%s" % flavor_id, body, "flavor_mapper")
+        return self._update("/flavor_mapper/%s" % flavor_id, body,
+                            "flavor_mapper")
