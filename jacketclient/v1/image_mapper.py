@@ -73,7 +73,7 @@ class ImageMapperManager(base.ManagerWithFind):
 
         image_mapper['image_id'] = image_id
         if dest_image_id:
-            image_mapper['dest_image_id'] = dest_image_id
+            image_mapper['provider_image_id'] = dest_image_id
 
         if project_id:
             image_mapper['project_id'] = project_id
